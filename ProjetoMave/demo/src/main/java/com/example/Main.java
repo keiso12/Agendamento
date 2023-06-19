@@ -1,3 +1,4 @@
+package com.example;
 import java.time.LocalDateTime;
 import java.util.Scanner;
 import java.sql.Connection;
@@ -6,64 +7,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-
 public class Main {
 
-    public static void exibirMenu() {
-        System.out.println("Menu:");
-        System.out.println("1. Adicionar Agendamento Pessoal");
-        System.out.println("2. Adicionar Agendamento de Trabalho");
-        System.out.println("3. Listar Agendamentos");
-        System.out.println("4. Sair");
-    }
-
-    public static void adicionarAgendamentoPessoal() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Data de Agendamento (AAAA-MM-DD HH:MM):");
-        LocalDateTime dataAgendamento = LocalDateTime.parse(scanner.nextLine());
-        System.out.println("Descrição:");
-        String descricao = scanner.nextLine();
-        System.out.println("Nome:");
-        String nome = scanner.nextLine();
-        System.out.println("Prioridade (ALTA ou BAIXA):");
-        String prioridade = scanner.nextLine();
-
-        AgendamentoPessoal agendamentoPessoal = new AgendamentoPessoal(dataAgendamento, descricao, nome, Agendamento.TipoAgendamento.PESSOAL, Agendamento.Prioridade.valueOf(prioridade));
-
-        try {
-            DBAgendamento.inserirAgendamento(agendamentoPessoal);
-            System.out.println("Agendamento Pessoal adicionado com sucesso!");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void adicionarAgendamentoTrabalho() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Data de Agendamento (AAAA-MM-DD HH:MM):");
-        LocalDateTime dataAgendamento = LocalDateTime.parse(scanner.nextLine());
-        System.out.println("Descrição:");
-        String descricao = scanner.nextLine();
-        System.out.println("Empresa:");
-        String empresa = scanner.nextLine();
-        System.out.println("Prioridade (ALTA ou BAIXA):");
-        String prioridade = scanner.nextLine();
-
-        AgendamentoTrabalho agendamentoTrabalho = new AgendamentoTrabalho(dataAgendamento, descricao, Agendamento.TipoAgendamento.PROFISSIONAL, Agendamento.Prioridade.valueOf(prioridade), empresa);
-
-        try {
-            DBAgendamento.inserirAgendamento(agendamentoTrabalho);
-            System.out.println("Agendamento de Trabalho adicionado com sucesso!");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void listarAgendamentos() {
-        System.out.println("Lista de Agendamentos:");
-        DBAgendamento.ListarAgendamentos();
-    }
-
+//===========================================
+//                  MENU
+//===========================================
     public static void main(String[] args) {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -72,20 +20,20 @@ public class Main {
             int opcao;
     
             do {
-                exibirMenu();
+                View.exibirMenu();
                 System.out.print("Digite o número da opção desejada: ");
                 opcao = scanner.nextInt();
                 scanner.nextLine(); // Limpa o scanner
     
                 switch (opcao) {
                     case 1:
-                        adicionarAgendamentoPessoal();
+                        View.adicionarAgendamentoPessoal();
                         break;
                     case 2:
-                        adicionarAgendamentoTrabalho();
+                        View.adicionarAgendamentoTrabalho();
                         break;
                     case 3:
-                        listarAgendamentos();
+                        View.listarAgendamentos();
                         break;
                     case 4:
                         System.out.println("Saindo...");
@@ -104,63 +52,12 @@ public class Main {
         }
     }
 }
-class Agendamento {
 
-    private LocalDateTime dataAgendamento;
-    private String descricao;
-    private TipoAgendamento tipo;
-    private Prioridade prioridade;
 
-    // CONSTRUTOR
-    public Agendamento( LocalDateTime dataAgendamento, String descricao, TipoAgendamento tipo, Prioridade prioridade) {
-        this.dataAgendamento = dataAgendamento;
-        this.descricao = descricao;
-        this.tipo = tipo;
-        this.prioridade = prioridade;
-    }
+//===========================================
+//              BANCO DE DADOS
+//===========================================
 
-    // GETTER E SETTER
-    public LocalDateTime getDataAgendamento() {
-        return dataAgendamento;
-    }
-    public void setDataAgendamento(LocalDateTime dataAgendamento) {
-        this.dataAgendamento = dataAgendamento;
-    }
-
-    public String getDescricao() {
-        return descricao;
-    }
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
-    }
-
-    public TipoAgendamento getTipo() {
-        return tipo;
-    }
-    public void setTipo(TipoAgendamento tipo) {
-        this.tipo = tipo;
-    }
-    
-    public Prioridade getPrioridade() {
-        return prioridade;
-    }
-    public void setPrioridade(Prioridade prioridade) {
-        this.prioridade = prioridade;
-    }
-
-    // ENUM
-    public enum TipoAgendamento {
-        PESSOAL,
-        PROFISSIONAL,
-        OUTRO
-    }
-
-    public enum Prioridade {
-        ALTA,
-        BAIXA
-    }
-
-}
 class DBAgendamento {
     
     static String url = "jdbc:mysql://localhost:3306/Agendamento";
@@ -168,7 +65,7 @@ class DBAgendamento {
     
     public static Connection getConnection() throws SQLException{
         if (connection == null || connection.isClosed()) {
-            connection = DriverManager.getConnection(url, "root", "kenzokoga1");
+            connection = DriverManager.getConnection(url, "root", "positivo");
         }
         return connection;
     }
@@ -275,42 +172,4 @@ class DBAgendamento {
         }
     }
     
-}
-
-class AgendamentoPessoal extends Agendamento {
-    private String nome;
-
-    // CONSTRUTOR
-    public AgendamentoPessoal(LocalDateTime dataAgendamento, String descricao, String nome, TipoAgendamento tipo, Prioridade prioridade) {
-        super(dataAgendamento, descricao, tipo, prioridade);
-        this.nome = nome;
-    }
-
-    // GETTER E SETTERS
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-}
-
-class AgendamentoTrabalho extends Agendamento {
-    private String empresa;
-
-    // CONSTRUTOR
-    public AgendamentoTrabalho(LocalDateTime dataAgendamento, String descricao, TipoAgendamento tipo, Prioridade prioridade, String empresa) {
-        super(dataAgendamento, descricao, tipo, prioridade);
-        this.empresa = empresa;
-    }
-
-    // GETTERS E SETTERS
-    public String getEmpresa() {
-        return empresa;
-    }
-
-    public void setEmpresa(String empresa) {
-        this.empresa = empresa;
-    }
 }
